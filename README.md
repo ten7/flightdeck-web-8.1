@@ -9,18 +9,6 @@ Features:
 * PHP optimized out of the box for Drupal sites, while supporting any PHP application.
 * Composer 2, xdebug 3, Imagemagick, Node, and SASS out of the box
 
-## Tags and versions
-
-Current software versions for latest and tags:
-
-| Tags | PHP version | Drupal versions | Composer | WP-CLI | Alpine |
-| ---- | ----------- | --------------- | ----- | ------ | ------ |
-| latest | 8.1 | 8, 9, 10 | 2.4.2 | 2.6.0 | 3.16 |
-| 1.0.0 | 8.1 | 8, 9, 10 | 2.4.2 | 2.6.0 | 3.16 |
-
-Where:
- * **x.y.z** is the container version as seen on the [tags page](https://github.com/ten7/flightdeck-web-8.1/tags)
-
 ## Configuration
 
 Instead of a large number of environment variables, this container relies on a file to perform all runtime configuration, `flightdeck-web.yml`. Inside the file, create following:
