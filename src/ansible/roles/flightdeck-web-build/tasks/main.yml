@@ -153,7 +153,8 @@
     mode: "u=rx,g=rx,o=rx"
 - name: Install Wordpress CLI
   get_url:
-    url: "https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar"
+    url: "https://github.com/wp-cli/wp-cli/releases/download/v2.8.1/wp-cli-2.8.1.phar"
+    checksum: "sha512:c1d40ee90b330ca1f8ddbed14b938b41ec5d9ff723c7c1cf3f41a2d9a1b271079a51a37ea3d1c9aa9c628fdd43449dba3995a8de150a68abbd505b06b91d9d2b"
     dest: "/etc/wpcli/wp"
     owner: "apache"
     group: "apache"
