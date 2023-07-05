@@ -51,6 +51,7 @@ flightdeck_run_commands: |
 flightdeck_path:
   - "/var/www/.composer/vendor/bin"
   - "/var/www/.npm-global/bin"
+  - "/var/www/vendor/bin"
 
 flightdeck_env:
   - name: "COMPOSER_MEMORY_LIMIT"
