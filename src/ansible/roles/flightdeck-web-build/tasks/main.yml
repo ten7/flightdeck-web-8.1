@@ -97,13 +97,10 @@
     - "/etc/ssl/apache2"
     - "/etc/apache2/sites.d"
     - "/etc/php81"
-    - "/etc/drush"
     - "/etc/wpcli"
     - "/run/apache2"
     - "/var/log/apache2"
     - "/var/www"
-    - "/var/www/.drush"
-    - "/var/www/.drush/sites"
     - "/var/www/.npm-global"
     - "/srv/html"
 - name: Link logs files to stdout for the Docker log collector
@@ -136,7 +133,6 @@
     group: "apache"
     mode: "u=rwx,g=rwx,o=r"
   loop:
-    - "/etc/drush"
     - "/etc/wpcli"
     - "/var/www/.composer/vendor/bin"
   become: yes
@@ -145,13 +141,6 @@
   register: command_output
 - debug:
     var: command_output.stdout_lines
-- name: Install Drush Launcher
-  get_url:
-    url: "https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar"
-    dest: "/etc/drush/drush"
-    owner: "apache"
-    group: "apache"
-    mode: "u=rx,g=rx,o=rx"
 - name: Install Wordpress CLI
   get_url:
     url: "https://github.com/wp-cli/wp-cli/releases/download/v2.8.1/wp-cli-2.8.1.phar"
@@ -160,7 +149,7 @@
     owner: "apache"
     group: "apache"
     mode: "u=rx,g=rx,o=rx"
-- name: Add global drush and wp symlinks
+- name: Add global symlinks
   file:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -168,8 +157,6 @@
     force: yes
     follow: no
   loop:
-    - src: "/etc/drush/drush"
-      dest: "/usr/local/bin/drush"
     - src: "/etc/wpcli/wp"
       dest: "/usr/local/bin/wp"
 - name: Set node global packages to install as user-local
