@@ -16,6 +16,7 @@
     - "php81-apache2"
     - "php81"
     - "git"
+    - "go-task"
     - "patch"
     - "curl"
     - "php81-bcmath"
@@ -64,8 +65,6 @@
     - "mariadb-client"
     - "rsync"
     - "openssh-client"
-    - "unixodbc-dev"
-    - "freetds-dev"
     - "nodejs"
     - "npm"
     - "libsass"
@@ -103,52 +102,6 @@
     - "/var/www"
     - "/var/www/.npm-global"
     - "/srv/html"
-- name: Link logs files to stdout for the Docker log collector
-  file:
-    src: "{{ item }}"
-    dest: "/dev/stdout"
-    state: link
-    force: yes
-    follow: no
-  loop:
-    - "/var/log/apache2/access.log"
-    - "/var/log/apache2/000_default-access_log"
-    - "/var/log/apache2/000_default_ssl-access_log"
-- name: Link logs files to stderr for the Docker log collector
-  file:
-    src: "{{ item }}"
-    dest: "/dev/stderr"
-    state: link
-    force: yes
-    follow: no
-  loop:
-    - "/var/log/apache2/error.log"
-    - "/var/log/apache2/000_default-error_log"
-    - "/var/log/apache2/000_default_ssl-error_log"
-- name: Make directories for cli utilities
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: "apache"
-    group: "apache"
-    mode: "u=rwx,g=rwx,o=r"
-  loop:
-    - "/etc/wpcli"
-    - "/var/www/.composer/vendor/bin"
-  become: yes
-  become_user: "apache"
-  become_method: "su"
-  register: command_output
-- debug:
-    var: command_output.stdout_lines
-- name: Install Wordpress CLI
-  get_url:
-    url: "https://github.com/wp-cli/wp-cli/releases/download/v2.8.1/wp-cli-2.8.1.phar"
-    checksum: "sha512:c1d40ee90b330ca1f8ddbed14b938b41ec5d9ff723c7c1cf3f41a2d9a1b271079a51a37ea3d1c9aa9c628fdd43449dba3995a8de150a68abbd505b06b91d9d2b"
-    dest: "/etc/wpcli/wp"
-    owner: "apache"
-    group: "apache"
-    mode: "u=rx,g=rx,o=rx"
 - name: Add global symlinks
   file:
     src: "{{ item.src }}"
@@ -157,8 +110,8 @@
     force: yes
     follow: no
   loop:
-    - src: "/etc/wpcli/wp"
-      dest: "/usr/local/bin/wp"
+    - src: "/usr/bin/go-task"
+      dest: "/usr/local/bin/task"
 - name: Set node global packages to install as user-local
   shell: >
     npm config set prefix '/var/www/.npm-global'
@@ -171,55 +124,6 @@
   become: yes
   become_user: "apache"
   become_method: "su"
-- name: Install Terminus
-  get_url:
-    url: "https://github.com/pantheon-systems/terminus/releases/download/3.2.1/terminus.phar"
-    checksum: "sha512:63d2c0af2f450c85b9596163261e07edf9c94c62f368f3e443ff44e7839d483474729a96f349e5ac405148888a06c04e6f3327bbb55468a008dbcf0e38295293"
-    dest: "/usr/local/bin/terminus"
-    owner: "apache"
-    group: "apache"
-    mode: "u=rx,g=rx,o="
-- name: Create temp file for the Platform CLI installer
-  tempfile:
-    state: file
-    prefix: installer
-    suffix: .sh
-  register: _platform_tempfile
-- name: Download Platform CLI installer
-  get_url:
-    url: "https://raw.githubusercontent.com/platformsh/cli/main/installer.sh"
-    checksum: "sha512:c24aeed710834f74132dbb5e122bddac8f5a56c83ee8925063b1025f3d935501025547b7a118c3146a37f88cf7f1d4e3e273667000f67b471c7257e2d88cbbec"
-    dest: "{{ _platform_tempfile.path }}"
-    owner: "root"
-    group: "root"
-    mode: "u=rx,g=rx,o="
-- name: Install the Platform CLI
-  shell: >
-    {{ _platform_tempfile.path }}
-  environment:
-    VERSION: "4.6.1"
-- name: Configure ODBC
-  template:
-    src: "templates/odbcinst.ini"
-    dest: "/etc/odbcinst.ini"
-    owner: "root"
-    group: "root"
-    mode: "u=rw,g=r,o=r"
-- name: Install the Acquia CLI
-  get_url:
-    url: "https://github.com/acquia/cli/releases/download/2.11.1/acli.phar"
-    checksum: "sha512:5c3fcd6f3553a719f99d05d8499d39bf7a5f3ab07a6bdd207ef282a8e838537597dd8e6f332a3e6df4725af3f3a168e376b54fec8fc5a6c49a2f32358f65943a"
-    dest: "/usr/local/bin/acli"
-    owner: "apache"
-    group: "apache"
-    mode: "u=rx,g=rx,o="
-- name: Configure ODBC
-  template:
-    src: "templates/odbcinst.ini"
-    dest: "/etc/odbcinst.ini"
-    owner: "root"
-    group: "root"
-    mode: "u=rw,g=r,o=r"
 - name: Template default index.html
   template:
     src: "templates/index.html"
